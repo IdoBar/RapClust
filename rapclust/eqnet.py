@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
-    import itertools
     import pandas as pd
     import numpy as np
     import os
@@ -22,7 +21,7 @@ def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
     numSamp = 0
     tot = 0
     eqClasses = {}
-    for sffile, eqfile in itertools.izip(sffiles, eqfiles):
+    for sffile, eqfile in zip(sffiles, eqfiles):
         quant = pd.read_table(sffile)
         quant.set_index('Name', inplace=True)
 
