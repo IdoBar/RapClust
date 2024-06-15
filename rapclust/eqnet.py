@@ -1,4 +1,3 @@
-from __future__ import print_function
 
 def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
     import pandas as pd
@@ -31,13 +30,13 @@ def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
             numEq = int(ifile.readline().rstrip())
             logging.info("quant file: {}; eq file: {}; # tran = {}; # eq = {}".format(sffile, eqfile, numTran, numEq))
             if firstSamp:
-                for i in xrange(numTran):
+                for i in range(numTran):
                     tnames.append(ifile.readline().rstrip())
                 diagCounts = np.zeros(len(tnames))
                 sumCounts = np.zeros(len(tnames))
                 ambigCounts = np.zeros(len(tnames))
             else:
-                for i in xrange(numTran):
+                for i in range(numTran):
                     ifile.readline()
 
             # for easy access to quantities of interest
@@ -47,8 +46,8 @@ def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
             epsilon =  np.finfo(float).eps
             sumCounts = np.maximum(sumCounts, estCount)
 
-            for i in xrange(numEq):
-                toks = map(int, ifile.readline().rstrip().split('\t'))
+            for i in range(numEq):
+                toks = list(map(int, ifile.readline().rstrip().split('\t')))
                 nt = toks[0]
                 tids = tuple(toks[1:-1])
                 count = toks[-1]
@@ -84,7 +83,7 @@ def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
     #  Go through the weightMap and remove any edges that
     #  have endpoints with too few mapping reads
     ##
-    for k,v in weightDict.iteritems():
+    for k,v in weightDict.items():
         c0, c1 = diagCounts[k[0]], diagCounts[k[1]]
         a0, a1 = ambigCounts[k[0]], ambigCounts[k[1]]
         if a0 + a1 > epsilon and a0 > cutoff and a1 > cutoff:
@@ -118,8 +117,8 @@ def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
         for olfile in orphanLinkFiles:
             for l in open(olfile):
                 left, right = l.rstrip().split(':')
-                lp = [map(int, i.split(',')) for i in left.rstrip('\t').split('\t')]
-                rp = [map(int, i.split(',')) for i in right.split('\t')]
+                lp = [list(map(int, i.split(','))) for i in left.rstrip('\t').split('\t')]
+                rp = [list(map(int, i.split(','))) for i in right.split('\t')]
                 lp = [t[0] for t in filter(nearEnd, lp)]
                 rp = [t[0] for t in filter(nearEnd, rp)]
                 if len(lp) == 1 and len(rp) == 1:
@@ -138,7 +137,7 @@ def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
 
     tnamesFilt = []
     relabel = {}
-    for i in xrange(len(estCount)):
+    for i in range(len(estCount)):
         if (diagCounts[i] > cutoff):
             relabel[i] = len(tnamesFilt)
             tnamesFilt.append(tnames[i])
@@ -159,7 +158,7 @@ def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
 
 def writeEdgeList(weightDict, tnames, ofile, G):
     useGraph = G is not None
-    for k,v in weightDict.iteritems():
+    for k,v in weightDict.items():
         ofile.write("{}\t{}\t{}\n".format(tnames[k[0]], tnames[k[1]], v))
         if useGraph:
             G.add_edge(tnames[k[0]], tnames[k[1]])
@@ -172,7 +171,7 @@ def writePajek(weightDict, tnames, relabel, ofile):
             ofile.write("{}\t\"{}\"\n".format(i, n))
         ofile.write("*Edges\n")
         print("There are {} edges\n".format(len(weightDict)))
-        for k,v in weightDict.iteritems():
+        for k,v in weightDict.items():
             ofile.write("{}\t{}\t{}\n".format(relabel[k[0]], relabel[k[1]], v))
             #ofile.write("{}\t{}\t{}\n".format(tnames[k[0]], tnames[k[1]], v))
             #if k[0] != k[1]:
@@ -201,15 +200,15 @@ def readEqClass(eqfile, eqCollection):
         print("file: {}; # tran = {}; # eq = {}".format(eqfile, numTran, numEq))
         if not eqCollection.hasNames:
             tnames = []
-            for i in xrange(numTran):
+            for i in range(numTran):
                 tnames.append(ifile.readline().rstrip())
             eqCollection.setNames(tnames)
         else:
-            for i in xrange(numTran):
+            for i in range(numTran):
                 ifile.readline()
 
-        for i in xrange(numEq):
-            toks = map(int, ifile.readline().rstrip().split('\t'))
+        for i in range(numEq):
+            toks = list(map(int, ifile.readline().rstrip().split('\t')))
             nt = toks[0]
             tids = tuple(toks[1:-1])
             count = toks[-1]
@@ -218,7 +217,7 @@ def readEqClass(eqfile, eqCollection):
 def getCountsFromEquiv(eqCollection):
     countDict = {}
     tn = eqCollection.tnames
-    for tids, count in eqCollection.eqClasses.iteritems():
+    for tids, count in eqCollection.eqClasses.items():
         for t in tids:
             if tn[t] in countDict:
                 countDict[tn[t]] += count
@@ -250,7 +249,7 @@ def filterGraph(expDict, netfile, ofile, auxDir):
 
     logger = logging.getLogger("rapclust")
     # Get just the set of condition names
-    conditions = expDict.keys()
+    conditions = list(expDict.keys())
     logging.info("conditions = {}".format(conditions))
 
     #for cond in conditions:
@@ -272,7 +271,7 @@ def filterGraph(expDict, netfile, ofile, auxDir):
     eqClasses = {}
     for cond in conditions:
         print(expDict[cond])
-        for sampNum, sampPath in expDict[cond].iteritems():
+        for sampNum, sampPath in expDict[cond].items():
             if cond not in eqClasses:
                 eqClasses[cond] = EquivCollection()
             eqPath = os.path.sep.join([sampPath, auxDir, "/eq_classes.txt"])
@@ -289,7 +288,7 @@ def filterGraph(expDict, netfile, ofile, auxDir):
     numTrimmed = 0
     with open(netfile) as f, open(ofile, 'w') as ofile:
         data = pd.read_table(f, header=None)
-        for i in tqdm(range(len(data))):
+        for i in tqdm(list(range(len(data)))):
             count += 1
             #print("\r{} done".format(count), end="")
             #Alternative hypo
@@ -321,6 +320,3 @@ def filterGraph(expDict, netfile, ofile, auxDir):
             else:
                 numTrimmed += 1
     logging.info("Trimmed {} edges".format(numTrimmed))
-
-
-
