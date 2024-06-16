@@ -97,7 +97,7 @@ def processQuant(config):
     stats['num clusts'] = len(sizes)
 
     with open(summaryFile, 'w') as ofile:
-        json.dump(stats, ofile)
+        json.dump(stats, ofile,default=int)
 
 if __name__ == "__main__":
     #parser = argparse.ArgumentParser(description='Cluster de novo assemblies.')
