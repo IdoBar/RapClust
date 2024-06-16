@@ -2,7 +2,7 @@
 def buildNetFile(sampdirs, netfile, cutoff, auxDir, writecomponents=False):
     import pandas as pd
     import numpy as np
-    import os
+    import os,itertools
     import logging
 
     logger = logging.getLogger("rapclust")
