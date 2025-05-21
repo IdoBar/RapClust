@@ -3,7 +3,7 @@ import sys
 import os
 import logging
 import coloredlogs
-
+import itertools
 import click
 import argparse
 import yaml
