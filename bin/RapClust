@@ -8,13 +8,22 @@ import click
 import argparse
 import yaml
 import json
-
+import numpy as np
 from rapclust import eqnet
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.command(context_settings=CONTEXT_SETTINGS)
 @click.option('--config', required=True, help='Config file describing the experimental setup')
+def myconverter(obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, datetime.datetime):
+            return obj.__str__()
 def processQuant(config):
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("rapclust")
@@ -95,9 +104,10 @@ def processQuant(config):
     stats['max clust size'] = sizes.max()
     stats['mean clust size'] = sizes.mean()
     stats['num clusts'] = len(sizes)
-
+    jsonstr = json.dumps(stats, default=myconverter)
     with open(summaryFile, 'w') as ofile:
-        json.dump(stats, ofile)
+        ofile.write(jsonstr)
+    #    json.dump(stats, ofile, default=myconverter)
 
 if __name__ == "__main__":
     #parser = argparse.ArgumentParser(description='Cluster de novo assemblies.')
