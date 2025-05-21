@@ -13,8 +13,6 @@ from rapclust import eqnet
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-@click.command(context_settings=CONTEXT_SETTINGS)
-@click.option('--config', required=True, help='Config file describing the experimental setup')
 def myconverter(obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -24,6 +22,10 @@ def myconverter(obj):
             return obj.tolist()
         elif isinstance(obj, datetime.datetime):
             return obj.__str__()
+
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.option('--config', required=True, help='Config file describing the experimental setup')
+
 def processQuant(config):
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("rapclust")
@@ -32,7 +34,7 @@ def processQuant(config):
     #config = args.config
     cfg = None
     with open(config, 'r') as yamCfg:
-        cfg = yaml.load(yamCfg)
+        cfg = yaml.load(yamCfg,Loader=yaml.FullLoader)
 
     # A list of all sample directories
     sampleDirs =  []
